@@ -1,0 +1,108 @@
+plugins {
+	id 'java'
+    id 'org.springframework.boot' version '3.3.9'
+    id 'io.spring.dependency-management' version '1.1.7'
+	id 'groovy'
+	id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+    id 'jacoco'
+	id 'checkstyle'
+}
+
+group = 'com.student'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+jar {
+    enabled = false
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	compile.exclude module: 'spring-boot-starter-tomcat'
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+dependencies {
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+	implementation (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.6.3') {
+		exclude group: "org.springframework.boot", module: 'spring-boot-starter-tomcat'
+	}
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-undertow', version: '2.6.3'
+	implementation 'com.h2database:h2'
+	implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.12'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.6.3'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '3.3.1'
+    
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+
+sourceSets {
+    test {
+        groovy {
+            srcDirs = ['src/test/groovy']
+        }
+    }
+}
+
+tasks.withType(Test).configureEach {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
+// def testExclusionList = [
+//         '**/config/**',
+//         '**/domain/**',
+//         '**/*Application*'
+// ]
+
+// test {
+// 	finalizedBy jacocoTestReport
+// }
+
+// jacocoTestReport {
+// 	afterEvaluate {
+// 		classDirectories.from = files(classDirectories.files.collect {
+// 			fileTree(dir: it, exclude: testExclusionList)
+// 		})
+// 	}
+// 	finalizedBy jacocoCoverageVerification
+// 	dependsOn test
+// }
+
+// def testCoverageLevels = ['CLASS', 'BRANCH', 'INSTRUCTION', 'METHOD', 'LINE']
+// jacocoCoverageVerification {
+// 	afterEvaluate {
+// 		classesDirectories.from = files(classDirectories.files.collect {
+// 			fileTree(dir: it, exclude: testExclusionList)
+// 		})
+// 	}
+// 	violationRules {
+// 		testCoverageLevels.forEach((testCoverageLevel) -> {
+// 			rule {
+// 				limit {
+// 					counter = testCoverageLevel
+// 					minimum = 0.8
+// 				}
+// 			}
+// 		})
+// 	}
+// 
+checkstyle {
+	configFile = new File(rootDir, 'checkstyle.xml')
+	toolVersion = '8.44'
+}
+checkstyleMain.source = 'src/main/java'
