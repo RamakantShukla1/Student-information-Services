@@ -33,7 +33,6 @@ public class Student {
     private String stdDepartment;
     private String stdGender;
    
-
     private void validate () {
         List <String> errors = new ArrayList <String> ();
         if (stdName == null || stdName.isEmpty ()) {
