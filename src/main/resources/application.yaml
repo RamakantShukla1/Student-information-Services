@@ -1,0 +1,52 @@
+# server:
+#  port: 8080
+# spring:
+#  application:
+#     name: student-information-system
+  
+# datasource:
+#   url: jdbc:h2:mem:studendb
+#   username: sa
+#   password:
+#   driver-class-name: org.h2.Driver
+# jpa:
+#   database-platform: org.hibernate.dialect.H2Dialect
+#   generate-ddl: true
+# h2:
+#   console:
+#   enabled: true
+
+# ---
+# spring:
+#   config:
+#     activate:
+#       on-profile: local
+#   datasource:
+#     url: jdbc:h2:mem:studendb
+#     username: sa
+#     password:
+#     driver-class-name: org.h2.Driver
+#   jpa:
+#     database-platform: org.hibernate.dialect.H2Dialect
+#     generate-ddl: true
+#   h2:
+#     console:
+#       enabled: true
+
+# ---
+# spring:
+#     config:
+#       activate:
+#         on-profile: prod
+
+# ---
+# spring:
+#   config:
+#     activate :
+#         on-profile: qa
+
+# ---
+# spring:
+#     config:
+#         activate:
+#             on-profile: dev
