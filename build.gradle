@@ -1,73 +1,82 @@
 plugins {
 	id 'java'
-    id 'org.springframework.boot' version '3.3.9'
-    id 'io.spring.dependency-management' version '1.1.7'
-	id 'groovy'
-	id 'org.barfuin.gradle.jacocolog' version '3.1.0'
-    id 'jacoco'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
 	id 'checkstyle'
+	id 'groovy'
+	id 'jacoco'
 }
 
-group = 'com.student'
+group = 'com.student-information-system'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 
-jar {
-    enabled = false
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+// jar {
+// 	enabled = false
+// }
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
 	mavenCentral()
 }
 
-configurations {
-	compile.exclude module: 'spring-boot-starter-tomcat'
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
 dependencies {
-	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-	implementation (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.6.3') {
-		exclude group: "org.springframework.boot", module: 'spring-boot-starter-tomcat'
-	}
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-undertow', version: '2.6.3'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.3.1'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '2.6.3'
 	implementation 'com.h2database:h2'
 	implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.12'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.6.3'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '3.3.1'
-    
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+	testImplementation group: 'org.apache.groovy', name: 'groovy-all', version: '3.9.1'
+	testImplementation group: 'org.spockframework', name: 'spock-spring', version: '2.4-M1-groovy-4.0'
+	testImplementation group: 'org.spockframewrok', name : 'spring-core', version: '2.4-M1-grorvy-4.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+
+tasks.named('test') {
+	useJUnitPlatform()
 }
 
 
 sourceSets {
-    test {
-        groovy {
-            srcDirs = ['src/test/groovy']
-        }
-    }
+	test {
+		groovy {
+			srcDirs = ['src/test/groovy']
+		}
+	}
 }
 
 tasks.withType(Test).configureEach {
-    testLogging {
-        exceptionFormat = 'full'
-    }
+	testLogging {
+		exceptionFormat = 'full'
+	}
 }
 
-// def testExclusionList = [
-//         '**/config/**',
-//         '**/domain/**',
-//         '**/*Application*'
-// ]
+def testExclusionList = [
+	'**/config/**',
+	'**/domain/**',
+	'**/*Application*',
+
+]
 
 // test {
 // 	finalizedBy jacocoTestReport
@@ -79,28 +88,95 @@ tasks.withType(Test).configureEach {
 // 			fileTree(dir: it, exclude: testExclusionList)
 // 		})
 // 	}
-// 	finalizedBy jacocoCoverageVerification
+// 	finalizedBy jacocoTestCoverageVerification
 // 	dependsOn test
 // }
 
-// def testCoverageLevels = ['CLASS', 'BRANCH', 'INSTRUCTION', 'METHOD', 'LINE']
-// jacocoCoverageVerification {
-// 	afterEvaluate {
-// 		classesDirectories.from = files(classDirectories.files.collect {
-// 			fileTree(dir: it, exclude: testExclusionList)
-// 		})
-// 	}
+// def testCoverageLevels = ['CLASS', 'BRANCH', 'INSTRUCTION', 'METHOD','LINE']
+// JacocoTestCoverageVerification {
+//    afterEvaluate {
+// 	classDirectories.from = files(classDirectories.files.collect {
+// 		fileTree(dir: it, exclude: testExclusionList)
+//    })
+// }
+
 // 	violationRules {
-// 		testCoverageLevels.forEach((testCoverageLevel) -> {
+// 		testCoverageLevels.each { testCoverageLevel ->
 // 			rule {
 // 				limit {
 // 					counter = testCoverageLevel
 // 					minimum = 0.8
 // 				}
 // 			}
-// 		})
-// 	}
-// 
+// 		}
+//   	}
+// }
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: testExclusionList)
+        }))
+    }
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: testExclusionList)
+        }))
+    }
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.8
+            }
+        }
+        rule {
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.8
+            }
+        }
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.8
+            }
+        }
+        rule {
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.8
+            }
+        }
+        rule {
+            limit {
+                counter = 'CLASS'
+                value = 'COVEREDRATIO'
+                minimum = 0.8
+            }
+        }
+    }
+}
+
 checkstyle {
 	configFile = new File(rootDir, 'checkstyle.xml')
 	toolVersion = '8.44'
