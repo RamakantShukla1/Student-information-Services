@@ -25,7 +25,7 @@ public class StudentService {
        return studentCrudRepository.save(student);
     }
 
-    public boolean deletStudent(Integer id) {
+    public boolean deleteStudent(Integer id) {
         if (studentCrudRepository.existsById(id)){
             studentCrudRepository.deleteById(id);
             return true;

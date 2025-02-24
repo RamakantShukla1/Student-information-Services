@@ -31,7 +31,7 @@ ResponseEntity<Student> addStudent(final @RequestBody Student student) {
 }
 
 @PutMapping("v1/updateStudent")
-ResponseEntity<Student> updateStudent(final @RequestBody Student student) {
+ResponseEntity<Student> updateStudentDetails(final @RequestBody Student student) {
    if (studentService.updateStudent(student) !=null) {
     return ResponseEntity.ok().body (studentService.updateStudent(student));
    } else {
@@ -41,7 +41,7 @@ ResponseEntity<Student> updateStudent(final @RequestBody Student student) {
 
    @DeleteMapping("v1/deleteStudent/{id}")
    ResponseEntity<Void> deleteStudent(final @PathVariable Integer id) {
-    if (studentService.deletStudent(id)){
+    if (studentService.deleteStudent(id)){
         return ResponseEntity.ok().build();
     } else {
       return ResponseEntity.notFound().build();
