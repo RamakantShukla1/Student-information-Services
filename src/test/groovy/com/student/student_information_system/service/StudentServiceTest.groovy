@@ -10,7 +10,6 @@ class StudentServiceTest extends Specification {
 
     def "should return student details"() {
         given:
-        given:
         def student = Student.builder().stdId(1).stdName("John").stdEmail("abc").stdPhone("123").stdAddress("USA").stdDepartment("CSE").build()
         def stdId = 1
         and:
